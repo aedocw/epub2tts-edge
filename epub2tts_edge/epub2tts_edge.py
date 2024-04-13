@@ -4,6 +4,7 @@ import concurrent.futures
 import os
 import re
 import subprocess
+import warnings
 
 
 from bs4 import BeautifulSoup
@@ -14,6 +15,8 @@ from mutagen import mp4
 #import nltk
 from nltk.tokenize import sent_tokenize
 from pydub import AudioSegment
+
+warnings.filterwarnings("ignore", module="ebooklib.epub")
 
 def chap2text_epub(chap):
     blacklist = [
@@ -54,7 +57,6 @@ def export(book, sourcefile):
         if item.get_type() == ebooklib.ITEM_DOCUMENT:
             chapter_title, chapter_paragraphs = chap2text_epub(item.get_content())
             book_contents.append({"title": chapter_title, "paragraphs": chapter_paragraphs})
-            #print(chapter_title)
     outfile = sourcefile.replace(".epub", ".txt")
     check_for_file(outfile)
     print(f"Exporting {sourcefile} to {outfile}")
@@ -162,7 +164,6 @@ def read_book(book_contents, speaker):
             #combine paragraphs into chapter
             append_silence(files[-1], 2800)
             combined = AudioSegment.empty()
-            print(files)
             for file in files:
                 combined += AudioSegment.from_mp3(file)
             combined.export(partname, format="mp3")
@@ -272,8 +273,8 @@ async def parallel_edgespeak(sentences, speakers, filenames):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="EpubToAudiobook",
-        description="Read an epub (or other source) to audiobook format",
+        prog="epub2tts-edge",
+        description="Read a text file to audiobook format",
     )
     parser.add_argument("sourcefile", type=str, help="The epub or text file to process")
     parser.add_argument(
