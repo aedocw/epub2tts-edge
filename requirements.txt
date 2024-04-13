@@ -1,0 +1,6 @@
+beautifulsoup4
+ebooklib
+edge-tts
+mutagen
+nltk
+pydub
