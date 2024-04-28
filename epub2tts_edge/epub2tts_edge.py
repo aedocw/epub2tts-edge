@@ -101,9 +101,12 @@ def get_book(sourcefile):
                 current_chapter["title"] = line[1:].strip()
                 chapter_titles.append(current_chapter["title"])
             elif line:
-                current_chapter["paragraphs"].append(line)
+                #skip any lines without at least one letter or number
+                if any(char.isalnum() for char in line):
+                    current_chapter["paragraphs"].append(line)
 
         if current_chapter["paragraphs"]:
+            print(current_chapter)
             book_contents.append(current_chapter)
 
     return book_contents, book_title, book_author, chapter_titles
