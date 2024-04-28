@@ -49,6 +49,7 @@ If you've found something new, please open an issue and be sure to include:
 <details>
 <summary>Release notes </summary>
 
+* 20240428: Improved final audio by using flac for intermediate audio files, sounds much better
 * 20240412: Initial release
 
 </details>
