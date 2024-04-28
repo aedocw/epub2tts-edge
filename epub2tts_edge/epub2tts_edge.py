@@ -135,7 +135,7 @@ def read_book(book_contents, speaker):
     segments = []
     for i, chapter in enumerate(book_contents, start=1):
         files = []
-        partname = f"part{i}.mp3"
+        partname = f"part{i}.flac"
         if os.path.isfile(partname):
             print(f"{partname} exists, skipping to next chapter")
             segments.append(partname)
@@ -155,9 +155,9 @@ def read_book(book_contents, speaker):
                     sorted_files.insert(0, "paras0.mp3")
                 combined = AudioSegment.empty()
                 for file in sorted_files:
-                    combined += AudioSegment.from_mp3(file)
-                ptemp = f"pgraphs{pindex}.mp3"
-                combined.export(ptemp, format='mp3')
+                    combined += AudioSegment.from_file(file)
+                ptemp = f"pgraphs{pindex}.flac"
+                combined.export(ptemp, format='flac')
                 for file in sorted_files:
                     os.remove(file)
                 files.append(ptemp)
@@ -165,8 +165,8 @@ def read_book(book_contents, speaker):
             append_silence(files[-1], 2800)
             combined = AudioSegment.empty()
             for file in files:
-                combined += AudioSegment.from_mp3(file)
-            combined.export(partname, format="mp3")
+                combined += AudioSegment.from_file(file)
+            combined.export(partname, format="flac")
             for file in files:
                 os.remove(file)
             segments.append(partname)
@@ -213,11 +213,9 @@ def make_m4b(files, sourcefile, speaker):
         "-i",
         filelist,
         "-codec:a",
-        "aac",
-        "-b:a",
-        "69k",
+        "flac",
         "-f",
-        "ipod",
+        "mp4",
         outputm4a,
     ]
     subprocess.run(ffmpeg_command)
@@ -230,7 +228,7 @@ def make_m4b(files, sourcefile, speaker):
         "-map_metadata",
         "1",
         "-codec",
-        "copy",
+        "aac",
         outputm4b,
     ]
     subprocess.run(ffmpeg_command)
@@ -242,12 +240,15 @@ def make_m4b(files, sourcefile, speaker):
     return outputm4b
 
 def add_cover(cover_img, filename):
-    if os.path.isfile(cover_img):
-        m4b = mp4.MP4(filename)
-        cover_image = open(cover_img, "rb").read()
-        m4b["covr"] = [mp4.MP4Cover(cover_image)]
-        m4b.save()
-    else:
+    try:
+        if os.path.isfile(cover_img):
+            m4b = mp4.MP4(filename)
+            cover_image = open(cover_img, "rb").read()
+            m4b["covr"] = [mp4.MP4Cover(cover_image)]
+            m4b.save()
+        else:
+            print(f"Cover image {cover_img} not found")
+    except:
         print(f"Cover image {cover_img} not found")
 
 def run_edgespeak(sentence, speaker, filename):

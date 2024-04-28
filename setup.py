@@ -10,7 +10,7 @@ setup(
     author_email="c@aedo.dev",
     url="https://github.com/aedocw/epub2tts-edge",
     license="GPL 3.0",
-    version="1.0.3",
+    version="1.1.0",
     packages=find_packages(),
     install_requires=requirements,
     entry_points={
