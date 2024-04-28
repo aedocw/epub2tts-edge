@@ -132,7 +132,7 @@ def append_silence(tempfile, duration=1200):
     # Append the silence segment to the audio
     combined = audio + silence
     # Save the combined audio back to file
-    combined.export(tempfile, format="mp3")
+    combined.export(tempfile, format="flac")
 
 def read_book(book_contents, speaker):
     segments = []
