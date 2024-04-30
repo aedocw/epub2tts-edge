@@ -106,7 +106,7 @@ def get_book(sourcefile):
                     current_chapter["paragraphs"].append(line)
 
         if current_chapter["paragraphs"]:
-            print(current_chapter)
+            #print(current_chapter)
             book_contents.append(current_chapter)
 
     return book_contents, book_title, book_author, chapter_titles
@@ -257,8 +257,18 @@ def add_cover(cover_img, filename):
         print(f"Cover image {cover_img} not found")
 
 def run_edgespeak(sentence, speaker, filename):
-    communicate = edge_tts.Communicate(sentence, speaker)
-    run_save(communicate, filename)
+    for speakattempt in range(3):
+        try:
+            communicate = edge_tts.Communicate(sentence, speaker)
+            run_save(communicate, filename)
+            if os.path.getsize(filename) == 0:
+                raise Exception("Failed to save file from edge_tts") from e
+            break
+        except Exception as e:
+            print(f"Attempt {speakattempt+1}/3 failed with '{sentence}' with error: {e}")
+    else:
+        print(f"Giving up on sentence '{sentence}' after 3 attempts in run_edgespeak.")
+        exit()
 
 def run_save(communicate, filename):
     asyncio.run(communicate.save(filename))
@@ -271,8 +281,16 @@ async def parallel_edgespeak(sentences, speakers, filenames):
         for sentence, speaker, filename in zip(sentences, speakers, filenames):
             async with semaphore:
                 loop = asyncio.get_running_loop()
-                task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
-                tasks.append(task)
+                for attempt in range(3): #retry up to 3 times
+                    try:
+                        task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
+                        tasks.append(task)
+                        break # Exit retry loop if successful
+                    except Exception as e:
+                        print(f"Attempt {attempt+1}/3 failed with '{sentence}' with error: {e}")
+                else:
+                    print(f"Giving up on sentence '{sentence}' after 3 attempts.")
+                    exit()
 
         await asyncio.gather(*tasks)
 
