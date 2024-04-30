@@ -219,6 +219,8 @@ def make_m4b(files, sourcefile, speaker):
         "flac",
         "-f",
         "mp4",
+        "strict",
+        "-2",
         outputm4a,
     ]
     subprocess.run(ffmpeg_command)
