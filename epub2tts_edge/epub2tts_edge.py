@@ -4,6 +4,7 @@ import concurrent.futures
 import os
 import re
 import subprocess
+import time
 import warnings
 
 
@@ -75,7 +76,8 @@ def export(book, sourcefile):
                 else:
                     file.write(f"# {chapter['title']}\n\n")
                 for paragraph in chapter["paragraphs"]:
-                    file.write(f"{paragraph}\n\n")
+                    clean = re.sub(r'[\s\n]+', ' ', paragraph)
+                    file.write(f"{clean}\n\n")
 
 def get_book(sourcefile):
     book_contents = []
@@ -106,7 +108,6 @@ def get_book(sourcefile):
                     current_chapter["paragraphs"].append(line)
 
         if current_chapter["paragraphs"]:
-            print(current_chapter)
             book_contents.append(current_chapter)
 
     return book_contents, book_title, book_author, chapter_titles
@@ -144,25 +145,28 @@ def read_book(book_contents, speaker):
             segments.append(partname)
         else:
             print(f"Chapter: {chapter['title']}\n")
-            asyncio.run(parallel_edgespeak([chapter['title']], [speaker], ['paras0.mp3']))
-            append_silence('paras0.mp3', 1200)
+            asyncio.run(parallel_edgespeak([chapter['title']], [speaker], ['sntnc0.mp3']))
+            append_silence('sntnc0.mp3', 1200)
             for pindex, paragraph in enumerate(chapter["paragraphs"]):
-                sentences = sent_tokenize(paragraph)
-                filenames = ['paras'+str(z+1)+".mp3" for z in range(len(sentences))]
-                speakers = [speaker] * len(sentences)
-                asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
-                append_silence(filenames[-1], 1200)
-                #combine sentences in paragraph
-                sorted_files = sorted(filenames, key=sort_key)
-                if os.path.exists("paras0.mp3"):
-                    sorted_files.insert(0, "paras0.mp3")
-                combined = AudioSegment.empty()
-                for file in sorted_files:
-                    combined += AudioSegment.from_file(file)
                 ptemp = f"pgraphs{pindex}.flac"
-                combined.export(ptemp, format='flac')
-                for file in sorted_files:
-                    os.remove(file)
+                if os.path.isfile(ptemp):
+                    print(f"{ptemp} exists, skipping to next paragraph")
+                else:
+                    sentences = sent_tokenize(paragraph)
+                    filenames = ['sntnc'+str(z+1)+".mp3" for z in range(len(sentences))]
+                    speakers = [speaker] * len(sentences)
+                    asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
+                    append_silence(filenames[-1], 1200)
+                    #combine sentences in paragraph
+                    sorted_files = sorted(filenames, key=sort_key)
+                    if os.path.exists("sntnc0.mp3"):
+                        sorted_files.insert(0, "sntnc0.mp3")
+                    combined = AudioSegment.empty()
+                    for file in sorted_files:
+                        combined += AudioSegment.from_file(file)
+                    combined.export(ptemp, format='flac')
+                    for file in sorted_files:
+                        os.remove(file)
                 files.append(ptemp)
             #combine paragraphs into chapter
             append_silence(files[-1], 2800)
@@ -257,8 +261,20 @@ def add_cover(cover_img, filename):
         print(f"Cover image {cover_img} not found")
 
 def run_edgespeak(sentence, speaker, filename):
-    communicate = edge_tts.Communicate(sentence, speaker)
-    run_save(communicate, filename)
+    for speakattempt in range(3):
+        try:
+            communicate = edge_tts.Communicate(sentence, speaker)
+            run_save(communicate, filename)
+            if os.path.getsize(filename) == 0:
+                raise Exception("Failed to save file from edge_tts") from e
+            break
+        except Exception as e:
+            print(f"Attempt {speakattempt+1}/3 failed with '{sentence}' in run_edgespeak with error: {e}")
+            # wait a few seconds in case its a transient network issue
+            time.sleep(3)
+    else:
+        print(f"Giving up on sentence '{sentence}' after 3 attempts in run_edgespeak.")
+        exit()
 
 def run_save(communicate, filename):
     asyncio.run(communicate.save(filename))
@@ -273,7 +289,6 @@ async def parallel_edgespeak(sentences, speakers, filenames):
                 loop = asyncio.get_running_loop()
                 task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
                 tasks.append(task)
-
         await asyncio.gather(*tasks)
 
 
