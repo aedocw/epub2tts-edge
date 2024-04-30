@@ -75,7 +75,8 @@ def export(book, sourcefile):
                 else:
                     file.write(f"# {chapter['title']}\n\n")
                 for paragraph in chapter["paragraphs"]:
-                    file.write(f"{paragraph}\n\n")
+                    clean = re.sub(r'[\s\n]+', ' ', paragraph)
+                    file.write(f"{clean}\n\n")
 
 def get_book(sourcefile):
     book_contents = []
@@ -265,7 +266,7 @@ def run_edgespeak(sentence, speaker, filename):
                 raise Exception("Failed to save file from edge_tts") from e
             break
         except Exception as e:
-            print(f"Attempt {speakattempt+1}/3 failed with '{sentence}' with error: {e}")
+            print(f"Attempt {speakattempt+1}/3 failed with '{sentence}' in run_edgespeak with error: {e}")
     else:
         print(f"Giving up on sentence '{sentence}' after 3 attempts in run_edgespeak.")
         exit()
