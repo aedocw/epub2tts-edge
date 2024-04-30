@@ -4,6 +4,7 @@ import concurrent.futures
 import os
 import re
 import subprocess
+import time
 import warnings
 
 
@@ -270,6 +271,8 @@ def run_edgespeak(sentence, speaker, filename):
             break
         except Exception as e:
             print(f"Attempt {speakattempt+1}/3 failed with '{sentence}' in run_edgespeak with error: {e}")
+            # wait a few seconds in case its a transient network issue
+            time.sleep(3)
     else:
         print(f"Giving up on sentence '{sentence}' after 3 attempts in run_edgespeak.")
         exit()
@@ -285,17 +288,8 @@ async def parallel_edgespeak(sentences, speakers, filenames):
         for sentence, speaker, filename in zip(sentences, speakers, filenames):
             async with semaphore:
                 loop = asyncio.get_running_loop()
-                for attempt in range(3): #retry up to 3 times
-                    try:
-                        task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
-                        tasks.append(task)
-                        break # Exit retry loop if successful
-                    except Exception as e:
-                        print(f"Attempt {attempt+1}/3 failed with '{sentence}' with error: {e}")
-                else:
-                    print(f"Giving up on sentence '{sentence}' after 3 attempts.")
-                    exit()
-
+                task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
+                tasks.append(task)
         await asyncio.gather(*tasks)
 
 
