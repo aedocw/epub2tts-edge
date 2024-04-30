@@ -108,7 +108,6 @@ def get_book(sourcefile):
                     current_chapter["paragraphs"].append(line)
 
         if current_chapter["paragraphs"]:
-            #print(current_chapter)
             book_contents.append(current_chapter)
 
     return book_contents, book_title, book_author, chapter_titles
