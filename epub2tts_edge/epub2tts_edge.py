@@ -148,22 +148,25 @@ def read_book(book_contents, speaker):
             asyncio.run(parallel_edgespeak([chapter['title']], [speaker], ['paras0.mp3']))
             append_silence('paras0.mp3', 1200)
             for pindex, paragraph in enumerate(chapter["paragraphs"]):
-                sentences = sent_tokenize(paragraph)
-                filenames = ['paras'+str(z+1)+".mp3" for z in range(len(sentences))]
-                speakers = [speaker] * len(sentences)
-                asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
-                append_silence(filenames[-1], 1200)
-                #combine sentences in paragraph
-                sorted_files = sorted(filenames, key=sort_key)
-                if os.path.exists("paras0.mp3"):
-                    sorted_files.insert(0, "paras0.mp3")
-                combined = AudioSegment.empty()
-                for file in sorted_files:
-                    combined += AudioSegment.from_file(file)
                 ptemp = f"pgraphs{pindex}.flac"
-                combined.export(ptemp, format='flac')
-                for file in sorted_files:
-                    os.remove(file)
+                if os.path.isfile(ptemp):
+                    print(f"{ptemp} exists, skipping to next paragraph")
+                else:
+                    sentences = sent_tokenize(paragraph)
+                    filenames = ['paras'+str(z+1)+".mp3" for z in range(len(sentences))]
+                    speakers = [speaker] * len(sentences)
+                    asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
+                    append_silence(filenames[-1], 1200)
+                    #combine sentences in paragraph
+                    sorted_files = sorted(filenames, key=sort_key)
+                    if os.path.exists("paras0.mp3"):
+                        sorted_files.insert(0, "paras0.mp3")
+                    combined = AudioSegment.empty()
+                    for file in sorted_files:
+                        combined += AudioSegment.from_file(file)
+                    combined.export(ptemp, format='flac')
+                    for file in sorted_files:
+                        os.remove(file)
                 files.append(ptemp)
             #combine paragraphs into chapter
             append_silence(files[-1], 2800)
