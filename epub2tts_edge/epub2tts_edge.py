@@ -103,8 +103,11 @@ def get_book(sourcefile):
                 current_chapter["title"] = line[1:].strip()
                 chapter_titles.append(current_chapter["title"])
             elif line:
-                #skip any lines without at least one letter or number
+                #skip any lines or sentences without at least one letter or number
                 if any(char.isalnum() for char in line):
+                    sentences = sent_tokenize(line)
+                    cleaned_sentences = [s for s in sentences if any(char.isalnum() for char in s)]
+                    line = ' '.join(cleaned_sentences)
                     current_chapter["paragraphs"].append(line)
 
         if current_chapter["paragraphs"]:
