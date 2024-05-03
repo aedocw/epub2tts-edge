@@ -15,20 +15,20 @@
 <details>
 <summary> Usage instructions</summary>
 
-## FIRST - extract epub contents to text:
+## FIRST - extract epub contents to text and cover image to png:
 1. `epub2tts-edge mybook.epub`
 2. **edit mybook.txt**, replacing `# Part 1` etc with desired chapter names, and removing front matter like table of contents and anything else you do not want read. **Note:** First two lines can be Title: and Author: to use that in audiobook metadata.
 
 ## Read text to audiobook:
 
-* `epub2tts-edge mybook.txt --cover <COVER JPEG>`
+* `epub2tts-edge mybook.txt --cover mybook.png`
 * Optional: specify a speaker with `--speaker <speaker>`. List available voices with `edge-tts --list-voices`, default speaker is `en-US-AndrewNeural` if `--speaker` is not specified.
 
 
 ## All options
-* -h, --help - show this help message and exit
-* --speaker SPEAKER - Speaker to use (example: en-US-EricNeural)
-* --cover image.jpg - jpg image to use for cover
+* `-h, --help` - show this help message and exit
+* `--speaker SPEAKER` - Speaker to use (example: en-US-EricNeural)
+* `--cover image.[jpg|png]` - image to use for cover
 
 </details>
 
@@ -49,6 +49,7 @@ If you've found something new, please open an issue and be sure to include:
 <details>
 <summary>Release notes </summary>
 
+* 20240502: Added export of cover image
 * 20240429: Fixed issues with running on linux
 * 20240428: Improved final audio by using flac for intermediate audio files, sounds much better
 * 20240412: Initial release
