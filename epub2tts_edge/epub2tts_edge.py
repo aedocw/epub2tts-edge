@@ -12,10 +12,22 @@ from bs4 import BeautifulSoup
 import ebooklib
 from ebooklib import epub
 import edge_tts
+from lxml import etree
 from mutagen import mp4
-#import nltk
 from nltk.tokenize import sent_tokenize
+from PIL import Image
 from pydub import AudioSegment
+import zipfile
+
+
+namespaces = {
+   "calibre":"http://calibre.kovidgoyal.net/2009/metadata",
+   "dc":"http://purl.org/dc/elements/1.1/",
+   "dcterms":"http://purl.org/dc/terms/",
+   "opf":"http://www.idpf.org/2007/opf",
+   "u":"urn:oasis:names:tc:opendocument:xmlns:container",
+   "xsi":"http://www.w3.org/2001/XMLSchema-instance",
+}
 
 warnings.filterwarnings("ignore", module="ebooklib.epub")
 
@@ -52,8 +64,45 @@ def chap2text_epub(chap):
 
     return chapter_title_text, paragraphs
 
+def get_epub_cover(epub_path):
+    try:
+        with zipfile.ZipFile(epub_path) as z:
+            t = etree.fromstring(z.read("META-INF/container.xml"))
+            rootfile_path =  t.xpath("/u:container/u:rootfiles/u:rootfile",
+                                        namespaces=namespaces)[0].get("full-path")
+
+            t = etree.fromstring(z.read(rootfile_path))
+            cover_meta = t.xpath("//opf:metadata/opf:meta[@name='cover']",
+                                        namespaces=namespaces)
+            if not cover_meta:
+                print("No cover image found.")
+                return None
+            cover_id = cover_meta[0].get("content")
+
+            cover_item = t.xpath("//opf:manifest/opf:item[@id='" + cover_id + "']",
+                                            namespaces=namespaces)
+            if not cover_item:
+                print("No cover image found.")
+                return None
+            cover_href = cover_item[0].get("href")
+            cover_path = os.path.join(os.path.dirname(rootfile_path), cover_href)
+
+            return z.open(cover_path)          
+    except FileNotFoundError:
+        print(f"Could not get cover image of {epub_path}")
+
 def export(book, sourcefile):
     book_contents = []
+    cover_image = get_epub_cover(sourcefile)
+    image_path = None
+
+    if cover_image is not None:
+        image = Image.open(cover_image)
+        image_filename = sourcefile.replace(".epub", ".png")
+        image_path = os.path.join(image_filename)
+        image.save(image_path)
+        print(f"Cover image saved to {image_path}")
+
     for item in book.get_items():
         if item.get_type() == ebooklib.ITEM_DOCUMENT:
             chapter_title, chapter_paragraphs = chap2text_epub(item.get_content())
