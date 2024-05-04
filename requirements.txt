@@ -1,6 +1,9 @@
 beautifulsoup4
 ebooklib
 edge-tts
+lxml
 mutagen
 nltk
+pillow
 pydub
+setuptools
