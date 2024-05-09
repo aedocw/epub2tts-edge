@@ -149,8 +149,13 @@ def get_book(sourcefile):
                 if current_chapter["paragraphs"]:
                     book_contents.append(current_chapter)
                     current_chapter = {"title": None, "paragraphs": []}
-                current_chapter["title"] = line[1:].strip()
-                chapter_titles.append(current_chapter["title"])
+                chapter_title = line[1:].strip()
+                if any(c.isalnum() for c in chapter_title):
+                    current_chapter["title"] = chapter_title
+                    chapter_titles.append(current_chapter["title"])
+                else:
+                    current_chapter["title"] = "blank"
+                    chapter_titles.append("blank")
             elif line:
                 #skip any lines or sentences without at least one letter or number
                 if any(char.isalnum() for char in line):
@@ -197,6 +202,8 @@ def read_book(book_contents, speaker):
             segments.append(partname)
         else:
             print(f"Chapter: {chapter['title']}\n")
+            if chapter['title'] == '':
+                chapter['title'] = 'blank'
             asyncio.run(parallel_edgespeak([chapter['title']], [speaker], ['sntnc0.mp3']))
             append_silence('sntnc0.mp3', 1200)
             for pindex, paragraph in enumerate(chapter["paragraphs"]):
@@ -205,6 +212,7 @@ def read_book(book_contents, speaker):
                     print(f"{ptemp} exists, skipping to next paragraph")
                 else:
                     sentences = sent_tokenize(paragraph)
+                    #print(f"Sentences to speak: {sentences}") ##DEBUGGING
                     filenames = ['sntnc'+str(z+1)+".mp3" for z in range(len(sentences))]
                     speakers = [speaker] * len(sentences)
                     asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
