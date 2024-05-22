@@ -133,8 +133,10 @@ def get_book(sourcefile):
     book_title = sourcefile
     book_author = "Unknown"
     chapter_titles = []
+    
     with open(sourcefile, "r", encoding="utf-8") as file:
-        current_chapter = {"title": None, "paragraphs": []}
+        current_chapter = {"title": "blank", "paragraphs": []}
+        initialized_first_chapter = False
         lines_skipped = 0
         for line in file:
             if lines_skipped < 2 and (line.startswith("Title") or line.startswith("Author")):
@@ -146,9 +148,11 @@ def get_book(sourcefile):
                 continue
             line = line.strip()
             if line.startswith("#"):
-                if current_chapter["paragraphs"]:
-                    book_contents.append(current_chapter)
+                if current_chapter["paragraphs"] or not initialized_first_chapter:
+                    if initialized_first_chapter:
+                        book_contents.append(current_chapter)
                     current_chapter = {"title": None, "paragraphs": []}
+                    initialized_first_chapter = True
                 chapter_title = line[1:].strip()
                 if any(c.isalnum() for c in chapter_title):
                     current_chapter["title"] = chapter_title
@@ -157,13 +161,16 @@ def get_book(sourcefile):
                     current_chapter["title"] = "blank"
                     chapter_titles.append("blank")
             elif line:
-                #skip any lines or sentences without at least one letter or number
+                if not initialized_first_chapter:
+                    chapter_titles.append("blank")
+                    initialized_first_chapter = True
                 if any(char.isalnum() for char in line):
                     sentences = sent_tokenize(line)
                     cleaned_sentences = [s for s in sentences if any(char.isalnum() for char in s)]
                     line = ' '.join(cleaned_sentences)
                     current_chapter["paragraphs"].append(line)
-
+        
+        # Append the last chapter if it contains any paragraphs.
         if current_chapter["paragraphs"]:
             book_contents.append(current_chapter)
 
