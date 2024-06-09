@@ -217,7 +217,7 @@ def read_book(book_contents, speaker):
             )
             append_silence("sntnc0.mp3", 1200)
             for pindex, paragraph in enumerate(
-                tqdm(chapter["paragraphs"], desc=f"Processing chapter {i}",unit='pg/s')
+                tqdm(chapter["paragraphs"], desc=f"Processing chapter {i}",unit='pg')
             ):
                 ptemp = f"pgraphs{pindex}.flac"
                 if os.path.isfile(ptemp):
