@@ -7,3 +7,4 @@ nltk
 pillow
 pydub
 setuptools
+tqdm
