@@ -6,6 +6,7 @@ import re
 import subprocess
 import time
 import warnings
+from tqdm import tqdm
 
 
 from bs4 import BeautifulSoup
@@ -209,33 +210,38 @@ def read_book(book_contents, speaker):
             segments.append(partname)
         else:
             print(f"Chapter: {chapter['title']}\n")
-            if chapter['title'] == '':
-                chapter['title'] = 'blank'
-            asyncio.run(parallel_edgespeak([chapter['title']], [speaker], ['sntnc0.mp3']))
-            append_silence('sntnc0.mp3', 1200)
-            for pindex, paragraph in enumerate(chapter["paragraphs"]):
+            if chapter["title"] == "":
+                chapter["title"] = "blank"
+            asyncio.run(
+                parallel_edgespeak([chapter["title"]], [speaker], ["sntnc0.mp3"])
+            )
+            append_silence("sntnc0.mp3", 1200)
+            for pindex, paragraph in enumerate(
+                tqdm(chapter["paragraphs"], desc=f"Processing chapter {i}",unit='pg')
+            ):
                 ptemp = f"pgraphs{pindex}.flac"
                 if os.path.isfile(ptemp):
                     print(f"{ptemp} exists, skipping to next paragraph")
                 else:
                     sentences = sent_tokenize(paragraph)
-                    #print(f"Sentences to speak: {sentences}") ##DEBUGGING
-                    filenames = ['sntnc'+str(z+1)+".mp3" for z in range(len(sentences))]
+                    filenames = [
+                        "sntnc" + str(z + 1) + ".mp3" for z in range(len(sentences))
+                    ]
                     speakers = [speaker] * len(sentences)
                     asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
                     append_silence(filenames[-1], 1200)
-                    #combine sentences in paragraph
+                    # combine sentences in paragraph
                     sorted_files = sorted(filenames, key=sort_key)
                     if os.path.exists("sntnc0.mp3"):
                         sorted_files.insert(0, "sntnc0.mp3")
                     combined = AudioSegment.empty()
                     for file in sorted_files:
                         combined += AudioSegment.from_file(file)
-                    combined.export(ptemp, format='flac')
+                    combined.export(ptemp, format="flac")
                     for file in sorted_files:
                         os.remove(file)
                 files.append(ptemp)
-            #combine paragraphs into chapter
+            # combine paragraphs into chapter
             append_silence(files[-1], 2800)
             combined = AudioSegment.empty()
             for file in files:
