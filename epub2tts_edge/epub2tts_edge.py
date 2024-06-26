@@ -127,6 +127,8 @@ def export(book, sourcefile):
                     file.write(f"# {chapter['title']}\n\n")
                 for paragraph in chapter["paragraphs"]:
                     clean = re.sub(r'[\s\n]+', ' ', paragraph)
+                    clean = re.sub(r'[!]+', '!', clean)
+                    clean = re.sub(r'[?]+', '?', clean)
                     file.write(f"{clean}\n\n")
 
 def get_book(sourcefile):
