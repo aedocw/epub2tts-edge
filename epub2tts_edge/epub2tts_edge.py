@@ -360,6 +360,8 @@ async def parallel_edgespeak(sentences, speakers, filenames):
         for sentence, speaker, filename in zip(sentences, speakers, filenames):
             async with semaphore:
                 loop = asyncio.get_running_loop()
+                sentence = re.sub(r'[!]+', '!', sentence)
+                sentence = re.sub(r'[?]+', '?', sentence)
                 task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
                 tasks.append(task)
         await asyncio.gather(*tasks)
