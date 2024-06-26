@@ -127,8 +127,6 @@ def export(book, sourcefile):
                     file.write(f"# {chapter['title']}\n\n")
                 for paragraph in chapter["paragraphs"]:
                     clean = re.sub(r'[\s\n]+', ' ', paragraph)
-                    clean = re.sub(r'[!]+', '!', clean)
-                    clean = re.sub(r'[?]+', '?', clean)
                     file.write(f"{clean}\n\n")
 
 def get_book(sourcefile):
@@ -362,6 +360,8 @@ async def parallel_edgespeak(sentences, speakers, filenames):
         for sentence, speaker, filename in zip(sentences, speakers, filenames):
             async with semaphore:
                 loop = asyncio.get_running_loop()
+                sentence = re.sub(r'[!]+', '!', sentence)
+                sentence = re.sub(r'[?]+', '?', sentence)
                 task = loop.run_in_executor(executor, run_edgespeak, sentence, speaker, filename)
                 tasks.append(task)
         await asyncio.gather(*tasks)
