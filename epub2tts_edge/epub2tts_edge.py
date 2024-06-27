@@ -6,6 +6,7 @@ import re
 import subprocess
 import time
 import warnings
+import sys
 from tqdm import tqdm
 
 
@@ -95,7 +96,7 @@ def get_epub_cover(epub_path):
             cover_href = cover_item[0].get("href")
             cover_path = os.path.join(os.path.dirname(rootfile_path), cover_href)
 
-            return z.open(cover_path)          
+            return z.open(cover_path)
     except FileNotFoundError:
         print(f"Could not get cover image of {epub_path}")
 
@@ -111,10 +112,22 @@ def export(book, sourcefile):
         image.save(image_path)
         print(f"Cover image saved to {image_path}")
 
+    spine_ids = []
+    for spine_tuple in book.spine:
+        if spine_tuple[1] == 'yes': # if item in spine is linear
+            spine_ids.append(spine_tuple[0])
+
+    items = {}
     for item in book.get_items():
         if item.get_type() == ebooklib.ITEM_DOCUMENT:
-            chapter_title, chapter_paragraphs = chap2text_epub(item.get_content())
-            book_contents.append({"title": chapter_title, "paragraphs": chapter_paragraphs})
+            items[item.get_id()] = item
+
+    for id in spine_ids:
+        item = items.get(id, None)
+        if item is None:
+            continue
+        chapter_title, chapter_paragraphs = chap2text_epub(item.get_content())
+        book_contents.append({"title": chapter_title, "paragraphs": chapter_paragraphs})
     outfile = sourcefile.replace(".epub", ".txt")
     check_for_file(outfile)
     print(f"Exporting {sourcefile} to {outfile}")
@@ -141,7 +154,7 @@ def get_book(sourcefile):
     book_title = sourcefile
     book_author = "Unknown"
     chapter_titles = []
-    
+
     with open(sourcefile, "r", encoding="utf-8") as file:
         current_chapter = {"title": "blank", "paragraphs": []}
         initialized_first_chapter = False
@@ -177,7 +190,7 @@ def get_book(sourcefile):
                     cleaned_sentences = [s for s in sentences if any(char.isalnum() for char in s)]
                     line = ' '.join(cleaned_sentences)
                     current_chapter["paragraphs"].append(line)
-        
+
         # Append the last chapter if it contains any paragraphs.
         if current_chapter["paragraphs"]:
             book_contents.append(current_chapter)
