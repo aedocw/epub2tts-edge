@@ -15,6 +15,7 @@ from ebooklib import epub
 import edge_tts
 from lxml import etree
 from mutagen import mp4
+import nltk
 from nltk.tokenize import sent_tokenize
 from PIL import Image
 from pydub import AudioSegment
@@ -31,6 +32,12 @@ namespaces = {
 }
 
 warnings.filterwarnings("ignore", module="ebooklib.epub")
+
+def ensure_punkt():
+    try:
+        nltk.data.find("tokenizers/punkt")
+    except LookupError:
+        nltk.download("punkt")
 
 def chap2text_epub(chap):
     blacklist = [
@@ -389,6 +396,8 @@ def main():
 
     args = parser.parse_args()
     print(args)
+
+    ensure_punkt()
 
     #If we get an epub, export that to txt file, then exit
     if args.sourcefile.endswith(".epub"):
