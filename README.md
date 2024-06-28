@@ -51,9 +51,10 @@ If you've found something new, please open an issue and be sure to include:
 <details>
 <summary>Release notes </summary>
 
+* 20240628: Improved how chapter items are ordered (https://github.com/prydom)
 * 20240627: Added check for NLTK tokenizer, download if not already there
-* 20240626: Catch multiple !!! and ??? which chokes Edge TTS
-* 20240609: Added progress bar
+* 20240626: Catch multiple !!! and ??? which chokes Edge TTS (https://github.com/erfansamandarian)
+* 20240609: Added progress bar (https://github.com/The-Ducktor)
 * 20240502: Added export of cover image
 * 20240429: Fixed issues with running on linux
 * 20240428: Improved final audio by using flac for intermediate audio files, sounds much better
