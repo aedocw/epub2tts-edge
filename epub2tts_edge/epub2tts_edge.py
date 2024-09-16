@@ -95,7 +95,8 @@ def get_epub_cover(epub_path):
                 return None
             cover_href = cover_item[0].get("href")
             cover_path = os.path.join(os.path.dirname(rootfile_path), cover_href)
-
+            if os.name == 'nt' and '\\' in cover_path:
+                cover_path = cover_path.replace("\\", "/")
             return z.open(cover_path)
     except FileNotFoundError:
         print(f"Could not get cover image of {epub_path}")
