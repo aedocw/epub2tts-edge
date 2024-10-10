@@ -39,6 +39,10 @@ def ensure_punkt():
         nltk.data.find("tokenizers/punkt")
     except LookupError:
         nltk.download("punkt")
+    try:
+        nltk.data.find("tokenizers/punkt_tab")
+    except LookupError:
+        nltk.download("punkt_tab")
 
 def chap2text_epub(chap):
     blacklist = [
