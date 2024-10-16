@@ -31,6 +31,8 @@
 * `-h, --help` - show this help message and exit
 * `--speaker SPEAKER` - Speaker to use (example: en-US-EricNeural)
 * `--cover image.[jpg|png]` - image to use for cover
+* `--paragraphpause <N>` - number of milliseconds to pause between paragraphs
+* `--sentencepause <N>` - number of milliseconds to pause between sentences
 
 </details>
 
