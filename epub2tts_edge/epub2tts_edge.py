@@ -224,7 +224,7 @@ def append_silence(tempfile, duration=1200):
     # Save the combined audio back to file
     combined.export(tempfile, format="flac")
 
-def read_book(book_contents, speaker):
+def read_book(book_contents, speaker, pause):
     segments = []
     for i, chapter in enumerate(book_contents, start=1):
         files = []
@@ -253,7 +253,7 @@ def read_book(book_contents, speaker):
                     ]
                     speakers = [speaker] * len(sentences)
                     asyncio.run(parallel_edgespeak(sentences, speakers, filenames))
-                    append_silence(filenames[-1], 1200)
+                    append_silence(filenames[-1], pause)
                     # combine sentences in paragraph
                     sorted_files = sorted(filenames, key=sort_key)
                     if os.path.exists("sntnc0.mp3"):
@@ -266,7 +266,7 @@ def read_book(book_contents, speaker):
                         os.remove(file)
                 files.append(ptemp)
             # combine paragraphs into chapter
-            append_silence(files[-1], 2800)
+            append_silence(files[-1], 2000)
             combined = AudioSegment.empty()
             for file in files:
                 combined += AudioSegment.from_file(file)
@@ -410,6 +410,12 @@ def main():
         type=str,
         help="jpg image to use for cover",
     )
+    parser.add_argument(
+        "--pause",
+        type=int,
+        default=1200,
+        help="duration of pause in milliseconds (default: 1200)"
+    )
 
     args = parser.parse_args()
     print(args)
@@ -423,7 +429,7 @@ def main():
         exit()
 
     book_contents, book_title, book_author, chapter_titles = get_book(args.sourcefile)
-    files = read_book(book_contents, args.speaker)
+    files = read_book(book_contents, args.speaker, args.pause)
     generate_metadata(files, book_author, book_title, chapter_titles)
     m4bfilename = make_m4b(files, args.sourcefile, args.speaker)
     add_cover(args.cover, m4bfilename)
