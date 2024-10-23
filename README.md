@@ -20,6 +20,9 @@
 ## OPTIONAL - activate the virutal environment if using
 1. `source .venv/bin/activate`
 
+## OPTIONAL - activate the virutal environment if using
+1. `source .venv/bin/activate`
+
 ## FIRST - extract epub contents to text and cover image to png:
 1. `epub2tts-edge mybook.epub`
 2. **edit mybook.txt**, replacing `# Part 1` etc with desired chapter names, and removing front matter like table of contents and anything else you do not want read. **Note:** First two lines can be Title: and Author: to use that in audiobook metadata.
@@ -37,6 +40,8 @@
 * `--paragraphpause <N>` - number of milliseconds to pause between paragraphs
 * `--sentencepause <N>` - number of milliseconds to pause between sentences
 
+## Deactivate virtual environment
+`deactivate`
 ## Deactivate virtual environment
 `deactivate`
 </details>
@@ -129,6 +134,7 @@ Running epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps
 
 1. cd to repo directory
 2. `git pull`
+3. Activate virtual environment you installed epub2tts in if you installed in a virtual environment using "source venv/bin/activate"
 3. Activate virtual environment you installed epub2tts in if you installed in a virtual environment using "source venv/bin/activate"
 4. `pip install . --upgrade`
 </details>
