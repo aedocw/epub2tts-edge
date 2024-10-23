@@ -17,6 +17,9 @@
 
 *NOTE:* If you want to specify where NLTK tokenizer will be stored (about 50mb), use an environment variable: `export NLTK_DATA="your/path/to/nltk_data"`
 
+## OPTIONAL - activate the virutal environment if using
+1. `source .venv/bin/activate`
+
 ## FIRST - extract epub contents to text and cover image to png:
 1. `epub2tts-edge mybook.epub`
 2. **edit mybook.txt**, replacing `# Part 1` etc with desired chapter names, and removing front matter like table of contents and anything else you do not want read. **Note:** First two lines can be Title: and Author: to use that in audiobook metadata.
@@ -34,6 +37,8 @@
 * `--paragraphpause <N>` - number of milliseconds to pause between paragraphs
 * `--sentencepause <N>` - number of milliseconds to pause between sentences
 
+## Deactivate virtual environment
+`deactivate`
 </details>
 
 ## 🐞 Reporting bugs
@@ -100,6 +105,8 @@ sudo apt install espeak-ng ffmpeg
 #clone the repo
 git clone https://github.com/aedocw/epub2tts-edge
 cd epub2tts-edge
+#OPTIONAL - install this in a virtual environment
+python -m venv .venv && source .venv/bin/activate
 pip install .
 ```
 
@@ -122,7 +129,7 @@ Runnig epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps 
 
 1. cd to repo directory
 2. `git pull`
-3. Activate virtual environment you installed epub2tts in if you installed in a virtual environment
+3. Activate virtual environment you installed epub2tts in if you installed in a virtual environment using "source venv/bin/activate"
 4. `pip install . --upgrade`
 </details>
 
