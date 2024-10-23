@@ -97,16 +97,16 @@ pip install .
 <details>
 <summary>LINUX INSTALLATION</summary>
 
-These instructions are for Ubuntu 22.04 (20.04 showed some depedency issues), but should work (with appropriate package installer mods) for just about any repo. Ensure you have `ffmpeg` installed before use.
+These instructions are for Ubuntu 24.04.1 LTS and 22.04  (20.04 showed some depedency issues), but should work (with appropriate package installer mods) for just about any repo. Ensure you have `ffmpeg` installed before use.
 
 ```
 #install dependencies
-sudo apt install espeak-ng ffmpeg
+sudo apt install espeak-ng ffmpeg python3-venv
 #clone the repo
 git clone https://github.com/aedocw/epub2tts-edge
 cd epub2tts-edge
 #OPTIONAL - install this in a virtual environment
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install .
 ```
 
@@ -115,7 +115,7 @@ pip install .
 <details>
 <summary>WINDOWS INSTALLATION</summary>
 
-Runnig epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps should work for running directly in windows.
+Running epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps should work for running directly in windows.
 
 (TBD)
 
