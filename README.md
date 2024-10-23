@@ -130,7 +130,6 @@ Running epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps
 1. cd to repo directory
 2. `git pull`
 3. Activate virtual environment you installed epub2tts in if you installed in a virtual environment using "source venv/bin/activate"
-3. Activate virtual environment you installed epub2tts in if you installed in a virtual environment using "source venv/bin/activate"
 4. `pip install . --upgrade`
 </details>
 
