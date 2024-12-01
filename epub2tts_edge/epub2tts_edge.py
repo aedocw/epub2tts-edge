@@ -165,15 +165,21 @@ def get_book(sourcefile):
     with open(sourcefile, "r", encoding="utf-8") as file:
         current_chapter = {"title": "blank", "paragraphs": []}
         initialized_first_chapter = False
-        lines_skipped = 0
+        next_line_is_book_metadata = False
         for line in file:
-            if lines_skipped < 2 and (line.startswith("Title") or line.startswith("Author")):
-                lines_skipped += 1
-                if line.startswith('Title: '):
-                    book_title = line.replace('Title: ', '').strip()
-                elif line.startswith('Author: '):
-                    book_author = line.replace('Author: ', '').strip()
-                continue
+
+            if next_line_is_book_metadata:
+                if ", by " in line:
+                    book_title, book_author = line.split(", by ")
+                    book_title = book_title.strip()
+                    book_author = book_author.strip()
+                    next_line_is_book_metadata = False
+                else:
+                    raise ValueError("The line was expected to be in the format: \"Book Title, by Author\".")
+
+            if line == "# Title\n":
+                next_line_is_book_metadata = True
+
             line = line.strip()
             if line.startswith("#"):
                 if current_chapter["paragraphs"] or not initialized_first_chapter:
@@ -287,6 +293,7 @@ def generate_metadata(files, author, title, chapter_titles):
         file.write(";FFMETADATA1\n")
         file.write(f"ARTIST={author}\n")
         file.write(f"ALBUM={title}\n")
+        file.write(f"TITLE={title}\n")
         file.write("DESCRIPTION=Made with https://github.com/aedocw/epub2tts-edge\n")
         for file_name in files:
             duration = get_duration(file_name)
