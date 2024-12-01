@@ -239,18 +239,11 @@ def read_book(book_contents, speaker, paragraphpause, sentencepause):
             print(f"Chapter: {chapter['title']}\n")
             if chapter["title"] == "":
                 chapter["title"] = "blank"
-<<<<<<< HEAD
-            asyncio.run(
-                parallel_edgespeak([chapter["title"]], [speaker], ["sntnc0.mp3"])
-            )
-            append_silence("sntnc0.mp3", sentencepause)
-=======
             if chapter["title"] != "Title":
                 asyncio.run(
                     parallel_edgespeak([chapter["title"]], [speaker], ["sntnc0.mp3"])
                 )
                 append_silence("sntnc0.mp3", 1200)
->>>>>>> 6493cdf (Change handling of title in txt writing and in reading.)
             for pindex, paragraph in enumerate(
                 tqdm(chapter["paragraphs"], desc=f"Processing chapter {i}",unit='pg')
             ):
