@@ -168,7 +168,6 @@ def get_book(sourcefile):
     with open(sourcefile, "r", encoding="utf-8") as file:
         current_chapter = {"title": "blank", "paragraphs": []}
         initialized_first_chapter = False
-        next_line_is_book_metadata = False
         lines_skipped = 0
         for line in file:
 
@@ -179,18 +178,6 @@ def get_book(sourcefile):
                 elif line.startswith('Author: '):
                     book_author = line.replace('Author: ', '').strip()
                 continue
-
-            if next_line_is_book_metadata:
-                if ", by " in line:
-                    book_title, book_author = line.split(", by ")
-                    book_title = book_title.strip()
-                    book_author = book_author.strip()
-                    next_line_is_book_metadata = False
-                else:
-                    raise ValueError("The line was expected to be in the format: \"Book Title, by Author\".")
-
-            if line == "# Title\n":
-                next_line_is_book_metadata = True
 
             line = line.strip()
             if line.startswith("#"):
