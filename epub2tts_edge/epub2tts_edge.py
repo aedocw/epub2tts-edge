@@ -238,6 +238,9 @@ def append_silence(tempfile, duration=1200):
 
 def read_book(book_contents, speaker, paragraphpause, sentencepause):
     segments = []
+    # Do not read these into the audio file:
+    title_names_to_skip_reading = ['Title', 'blank']
+
     for i, chapter in enumerate(book_contents, start=1):
         files = []
         partname = f"part{i}.flac"
@@ -247,14 +250,19 @@ def read_book(book_contents, speaker, paragraphpause, sentencepause):
             print(f"{partname} exists, skipping to next chapter")
             segments.append(partname)
         else:
-            print(f"Chapter name: \"{chapter['title']}\"")
+            if chapter["title"] in title_names_to_skip_reading:
+                print(f"Chapter name: \"{chapter['title']}\"  -  Note: The word \"{chapter['title']}\" will not be read into audio file.")
+            else:
+                print(f"Chapter name: \"{chapter['title']}\"")
+
             if chapter["title"] == "":
                 chapter["title"] = "blank"
-            if chapter["title"] != "Title":
+            if chapter["title"] not in title_names_to_skip_reading:
                 asyncio.run(
                     parallel_edgespeak([chapter["title"]], [speaker], ["sntnc0.mp3"])
                 )
                 append_silence("sntnc0.mp3", 1200)
+
             for pindex, paragraph in enumerate(
                 tqdm(chapter["paragraphs"], desc=f"Generating audio files: ",unit='pg')
             ):
