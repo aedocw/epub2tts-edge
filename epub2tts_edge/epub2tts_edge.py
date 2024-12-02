@@ -99,7 +99,8 @@ def get_epub_cover(epub_path):
                 return None
             cover_href = cover_item[0].get("href")
             cover_path = os.path.join(os.path.dirname(rootfile_path), cover_href)
-
+            if os.name == 'nt' and '\\' in cover_path:
+                cover_path = cover_path.replace("\\", "/")
             return z.open(cover_path)
     except FileNotFoundError:
         print(f"Could not get cover image of {epub_path}")
@@ -138,9 +139,12 @@ def export(book, sourcefile):
     author = book.get_metadata("DC", "creator")[0][0]
     booktitle = book.get_metadata("DC", "title")[0][0]
 
-    with open(outfile, "w") as file:
+    with open(outfile, "w", encoding='utf-8') as file:
         file.write(f"Title: {booktitle}\n")
         file.write(f"Author: {author}\n\n")
+
+        file.write(f"# Title\n")
+        file.write(f"{booktitle}, by {author}\n\n")
         for i, chapter in enumerate(book_contents, start=1):
             if chapter["paragraphs"] == [] or chapter["paragraphs"] == ['']:
                 continue
@@ -151,6 +155,8 @@ def export(book, sourcefile):
                     file.write(f"# {chapter['title']}\n\n")
                 for paragraph in chapter["paragraphs"]:
                     clean = re.sub(r'[\s\n]+', ' ', paragraph)
+                    clean = re.sub(r'[“”]', '"', clean)  # Curly double quotes to standard double quotes
+                    clean = re.sub(r'[‘’]', "'", clean)  # Curly single quotes to standard single quotes
                     file.write(f"{clean}\n\n")
 
 def get_book(sourcefile):
@@ -164,6 +170,7 @@ def get_book(sourcefile):
         initialized_first_chapter = False
         lines_skipped = 0
         for line in file:
+
             if lines_skipped < 2 and (line.startswith("Title") or line.startswith("Author")):
                 lines_skipped += 1
                 if line.startswith('Title: '):
@@ -171,6 +178,7 @@ def get_book(sourcefile):
                 elif line.startswith('Author: '):
                     book_author = line.replace('Author: ', '').strip()
                 continue
+
             line = line.strip()
             if line.startswith("#"):
                 if current_chapter["paragraphs"] or not initialized_first_chapter:
@@ -236,10 +244,11 @@ def read_book(book_contents, speaker, paragraphpause, sentencepause):
             print(f"Chapter: {chapter['title']}\n")
             if chapter["title"] == "":
                 chapter["title"] = "blank"
-            asyncio.run(
-                parallel_edgespeak([chapter["title"]], [speaker], ["sntnc0.mp3"])
-            )
-            append_silence("sntnc0.mp3", sentencepause)
+            if chapter["title"] != "Title":
+                asyncio.run(
+                    parallel_edgespeak([chapter["title"]], [speaker], ["sntnc0.mp3"])
+                )
+                append_silence("sntnc0.mp3", 1200)
             for pindex, paragraph in enumerate(
                 tqdm(chapter["paragraphs"], desc=f"Processing chapter {i}",unit='pg')
             ):
@@ -283,6 +292,7 @@ def generate_metadata(files, author, title, chapter_titles):
         file.write(";FFMETADATA1\n")
         file.write(f"ARTIST={author}\n")
         file.write(f"ALBUM={title}\n")
+        file.write(f"TITLE={title}\n")
         file.write("DESCRIPTION=Made with https://github.com/aedocw/epub2tts-edge\n")
         for file_name in files:
             duration = get_duration(file_name)
