@@ -140,6 +140,9 @@ def export(book, sourcefile):
     booktitle = book.get_metadata("DC", "title")[0][0]
 
     with open(outfile, "w", encoding='utf-8') as file:
+        file.write(f"Title: {booktitle}\n")
+        file.write(f"Author: {author}\n\n")
+
         file.write(f"# Title\n")
         file.write(f"{booktitle}, by {author}\n\n")
         for i, chapter in enumerate(book_contents, start=1):
@@ -166,7 +169,16 @@ def get_book(sourcefile):
         current_chapter = {"title": "blank", "paragraphs": []}
         initialized_first_chapter = False
         next_line_is_book_metadata = False
+        lines_skipped = 0
         for line in file:
+
+            if lines_skipped < 2 and (line.startswith("Title") or line.startswith("Author")):
+                lines_skipped += 1
+                if line.startswith('Title: '):
+                    book_title = line.replace('Title: ', '').strip()
+                elif line.startswith('Author: '):
+                    book_author = line.replace('Author: ', '').strip()
+                continue
 
             if next_line_is_book_metadata:
                 if ", by " in line:
