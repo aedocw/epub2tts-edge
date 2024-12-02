@@ -71,6 +71,10 @@ def chap2text_epub(chap):
             a.extract()
 
     chapter_paragraphs = soup.find_all("p")
+    if len(chapter_paragraphs) == 0:
+        print(f"Could not find any paragraph tags <p> in \"{chapter_title_text}\". Trying with <div>.")
+        chapter_paragraphs = soup.find_all("div")
+
     for p in chapter_paragraphs:
         paragraph_text = "".join(p.strings).strip()
         paragraphs.append(paragraph_text)
@@ -237,11 +241,14 @@ def read_book(book_contents, speaker, paragraphpause, sentencepause):
     for i, chapter in enumerate(book_contents, start=1):
         files = []
         partname = f"part{i}.flac"
+        print(f"\n\n")
+
         if os.path.isfile(partname):
             print(f"{partname} exists, skipping to next chapter")
             segments.append(partname)
         else:
             print(f"Chapter: {chapter['title']}\n")
+            print(f"Section name: \"{chapter['title']}\"")
             if chapter["title"] == "":
                 chapter["title"] = "blank"
             if chapter["title"] != "Title":
@@ -250,7 +257,7 @@ def read_book(book_contents, speaker, paragraphpause, sentencepause):
                 )
                 append_silence("sntnc0.mp3", 1200)
             for pindex, paragraph in enumerate(
-                tqdm(chapter["paragraphs"], desc=f"Processing chapter {i}",unit='pg')
+                tqdm(chapter["paragraphs"], desc=f"Generating audio files: ",unit='pg')
             ):
                 ptemp = f"pgraphs{pindex}.flac"
                 if os.path.isfile(ptemp):
@@ -312,8 +319,8 @@ def get_duration(file_path):
 def make_m4b(files, sourcefile, speaker):
     filelist = "filelist.txt"
     basefile = sourcefile.replace(".txt", "")
-    outputm4a = f"{basefile}-{speaker}.m4a"
-    outputm4b = f"{basefile}-{speaker}.m4b"
+    outputm4a = f"{basefile} ({speaker}).m4a"
+    outputm4b = f"{basefile} ({speaker}).m4b"
     with open(filelist, "w") as f:
         for filename in files:
             filename = filename.replace("'", "'\\''")
