@@ -26,3 +26,5 @@ pip-log.txt
 .tox
 
 .python-version
+/venv
+/.idea
