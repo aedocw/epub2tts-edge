@@ -121,6 +121,31 @@ Running epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps
 
 </details>
 
+<details>
+<summary>DOCKER</summary>
+
+Build the image
+
+```
+docker build . -t epub2tts_edge
+```
+
+Generate the txt file and modify as necessary.
+
+```
+docker run --rm -it -v ~/Downloads:/files epub2tts_edge "/files/<epub_file>.epub"
+```
+
+Generate audiobook.
+
+```
+docker run --rm -it -v ~/Downloads:/files epub2tts_edge "/files/<epub_file>.txt" [options]
+```
+
+The volume argument `~/Downloads:/files` maps `~/Downloads` on the host, to the path `/files` inside the container, so our paths added as cli arguments should also include the `/files` base path.
+
+</details>
+
 
 ## Updating
 
