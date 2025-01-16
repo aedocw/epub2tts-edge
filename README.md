@@ -117,7 +117,63 @@ pip install .
 
 Running epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps should work for running directly in windows.
 
-(TBD)
+This guide will assume that you know how to use:
+1. Windows PowerShell, some basics like running commands and changing directories
+2. GIT clone or at least capability to download repository from github site  
+
+This installation requires: python3.11, espeak-ng, ffmpeg.
+To whitch appropriate windows versions are provided throughout the installation process below:
+
+
+STEP 1: Get and set up all requirements:  
+Install [python 3.11](https://www.python.org/downloads/release/python-3117/).  
+Install latest [espeak-ng](https://github.com/espeak-ng/espeak-ng/releases) release (.msi x64 for 64 bit windows).  
+Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) package, github release has binaries for windows.  
+Unpack ffmpeg and add the bin folder to environmental variables according to this [tutorial](https://phoenixnap.com/kb/ffmpeg-windows).  
+
+
+STEP 2: Copy repository and install the app and its dependencies using PowerShell:  
+Install virtual environment python library:
+```
+pip install virtualenv
+```
+Clone the repo to your desired directory, i'll use 'C:\epub2tts-edge' as an example:
+```
+git clone https://github.com/aedocw/epub2tts-edge
+```
+Set powershell directory to your cloned repo:
+```
+cd C:\epub2tts-edge
+```
+Create virtual environment inside the directory:
+```
+py -m venv .venv
+```
+Run the app in virtual environment:
+```
+.venv\scripts\activate
+```
+Install the app and its required libs inside:
+```
+pip install .
+```
+
+
+STEP 3: Test the app and make sure everything works as intended.  
+This is done by geting a short sample ebook and converting it to an audiobook using the app.  
+Download [this sample ebook](https://github.com/bmaupin/epub-samples/releases/download/v0.3/basic-v3plus2.epub), or anything from [epub-samples](https://github.com/bmaupin/epub-samples/releases/) on github (or something short with a cover).  
+
+Now run this command on your .epub to convert it to a separate text and cover image:
+```
+epub2tts-edge sample.epub
+```
+You should now have both sample.txt and sample.png in the repo folder, you can check them out and edit them before making an audiobook.  
+
+Lastly, run the conversion and make a sample TTS audiobook:
+```
+epub2tts-edge sample.txt --cover sample.png
+```
+Installation done, you should now get a sample.m4u file. If it works then it's all good and you can get into converting your books.
 
 </details>
 
