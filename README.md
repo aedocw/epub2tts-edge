@@ -160,6 +160,8 @@ epub2tts-edge basic-v3plus2.txt --cover basic-v3plus2.png
 ```
 
 </details>
+
+<details>
 <summary>DOCKER</summary>
 
 Build the image
