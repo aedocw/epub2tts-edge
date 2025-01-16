@@ -124,11 +124,11 @@ This guide will assume that you know how to use:
 This installation requires: python3.11, espeak-ng, ffmpeg.
 To whitch appropriate windows versions are provided throughout the installation process below:
 
-STEP 1: Get and set up all requirements:
-Install [python 3.11](https://www.python.org/downloads/release/python-3117/)
-Install latest [espeak-ng](https://github.com/espeak-ng/espeak-ng/releases) release (.msi x64 for 64 bit windows)
-Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) package, github release has binaries for windows
-Unpack ffmpeg and add the bin folder to environmental variables according to this [tutorial](https://phoenixnap.com/kb/ffmpeg-windows)
+STEP 1: Get and set up all requirements:  
+Install [python 3.11](https://www.python.org/downloads/release/python-3117/)  
+Install latest [espeak-ng](https://github.com/espeak-ng/espeak-ng/releases) release (.msi x64 for 64 bit windows)  
+Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) package, github release has binaries for windows  
+Unpack ffmpeg and add the bin folder to environmental variables according to this [tutorial](https://phoenixnap.com/kb/ffmpeg-windows)  
 
 
 STEP 2: Get repository and install the app using PowerShell:
@@ -158,16 +158,15 @@ pip install .
 ```
 
 
-STEP 3: Test the app and make sure everything works as intended.
-This is done by geting a short sample ebook and converting it to an audiobook using the app.
-I recommend [this sample ebook](https://github.com/bmaupin/epub-samples/releases/download/v0.3/basic-v3plus2.epub), or anything from [epub-samples](https://github.com/bmaupin/epub-samples/releases/) on github (or something short with a cover)
-Run the app and make it convert .epub file to separate text and cover image
+STEP 3: Test the app and make sure everything works as intended.  
+This is done by geting a short sample ebook and converting it to an audiobook using the app.  
+I recommend [this sample ebook](https://github.com/bmaupin/epub-samples/releases/download/v0.3/basic-v3plus2.epub), or anything from [epub-samples](https://github.com/bmaupin/epub-samples/releases/) on github (or something short with a cover)  
+Run this command to convert .epub file to separate text and cover image:
 ```
 epub2tts-edge sample.epub
 ```
-You should now have sample.txt and sample.png in the repo folder, you can check them out and edit them before making an audiobook.
-```
-Run the conversion and make a sample TTS audiobook
+You should now have sample.txt and sample.png in the repo folder, you can check them out and edit them before making an audiobook.  
+Run the conversion and make a sample TTS audiobook:
 ```
 epub2tts-edge sample.txt --cover sample.png
 ```
