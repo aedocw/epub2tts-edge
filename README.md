@@ -117,11 +117,49 @@ pip install .
 
 Running epub2tts in WSL2 with Ubuntu 22 is the easiest approach, but these steps should work for running directly in windows.
 
-(TBD)
+This guide will assume that you know how to use:
+1. Windows PowerShell, some basics like running commands and changing directories
+2. GIT clone or at least capability to download repository from github site  
+
+This installation requires: python3.11, espeak-ng, ffmpeg.
+To whitch appropriate windows versions are provided throughout the installation process below:
+
+```
+#install python 3.11
+https://www.python.org/downloads/release/python-3117/
+#install latest espeak-ng windows release (.msi x64))
+https://github.com/espeak-ng/espeak-ng/releases
+#get ffmpeg binaries for windows
+https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
+#unpack it and add the bin folder to environmental variables, tutorial:
+https://phoenixnap.com/kb/ffmpeg-windows
+
+#repository installation steps (in powershell):
+#install virtual environment python library
+pip install virtualenv
+#clone the repo to your desired directory, i'll use 'C:\epub2tts-edge' as an example
+git clone https://github.com/aedocw/epub2tts-edge
+#set powershell directory to your cloned repo
+cd C:\epub2tts-edge
+#create virtual environment inside the directory
+py -m venv .venv
+#run app in virtual environment
+.venv\scripts\activate
+#install the app and its required libs inside
+pip install .
+
+#steps after installation are to test if everything works as intended
+#find test sample .epub file and copy it to the repo
+#I recommend basic-v3plus2.epub from here: https://github.com/bmaupin/epub-samples/releases/
+#create a .txt file with the content of the book and .png file if the book had a cover
+epub2tts-edge basic-v3plus2.epub
+#you can now find both files in your repo folder, check if they are there and look fine
+#convert using TTS  and pack all audio and the cover into .m4b audiobook format
+epub2tts-edge basic-v3plus2.txt --cover basic-v3plus2.png
+#installation done, if the audio works then it's all good and you can get into converting your books
+```
 
 </details>
-
-<details>
 <summary>DOCKER</summary>
 
 Build the image
